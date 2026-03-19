@@ -828,14 +828,14 @@
                         <i class="bi bi-person-gear fs-3"></i>
                     </div>
                     <div>
-                        <h5 class="modal-title fw-bold mb-0" id="editarPerfilModalLabel">Editar perfil</h5>
-                        <p class="text-muted small mb-0">Actualiza tus datos personales en BANKario</p>
+                        <h5 class="modal-title fw-bold mb-0" id="editarPerfilModalLabel">Información personal</h5>
+                        <p class="text-muted small mb-0">Gestiona tus datos de usuario en BANKario</p>
                     </div>
                 </div>
                 <button type="button" class="btn-close shadow-none" data-bs-dismiss="modal" aria-label="Cerrar"></button>
             </div>
             
-            <form action="/actualizar_perfil" method="post" class="p-4 pt-1">
+            <form id="formEditarPerfil" action="/actualizar_perfil" method="post" class="p-4 pt-1">
                 <div class="modal-body p-0 pt-3">
                     <div class="row g-3">
                         <div class="col-12">
@@ -843,7 +843,7 @@
                             <div class="input-group">
                                 <span class="input-group-text bg-light border-0"><i class="bi bi-person"></i></span>
                                 <input type="text" class="form-control bg-light border-0 py-2 px-3" id="editNombres" name="nombres"
-                                    value="{{ session.get('nombres', '') }}" placeholder="Tu nombre" required style="border-radius: 0 10px 10px 0;">
+                                    value="{{ session.get('nombres', '') }}" placeholder="Tu nombre" required readonly style="border-radius: 0 10px 10px 0;">
                             </div>
                         </div>
                         <div class="col-12">
@@ -851,7 +851,7 @@
                             <div class="input-group">
                                 <span class="input-group-text bg-light border-0"><i class="bi bi-person"></i></span>
                                 <input type="text" class="form-control bg-light border-0 py-2 px-3" id="editApellidos" name="apellidos"
-                                    value="{{ session.get('apellidos', '') }}" placeholder="Tus apellidos" required style="border-radius: 0 10px 10px 0;">
+                                    value="{{ session.get('apellidos', '') }}" placeholder="Tus apellidos" required readonly style="border-radius: 0 10px 10px 0;">
                             </div>
                         </div>
                         <div class="col-12">
@@ -871,66 +871,83 @@
                     </div>
                 </div>
                 
-                <div class="modal-footer border-0 p-0 pt-4 d-flex gap-2">
-                    <button type="button" class="btn btn-light rounded-pill px-4 flex-grow-1 fw-bold" data-bs-dismiss="modal">Cancelar</button>
-                    <button type="submit" class="btn btn-primary rounded-pill px-4 flex-grow-1 fw-bold shadow-sm">Guardar cambios</button>
+                <div class="modal-footer border-0 p-0 pt-4 d-flex gap-2" id="footerPerfil">
+                    <button type="button" class="btn btn-outline-primary rounded-pill px-4 flex-grow-1 fw-bold" id="btnHabilitarEdicion">
+                        <i class="bi bi-pencil me-1"></i> Editar
+                    </button>
+                    <button type="submit" class="btn btn-primary rounded-pill px-4 flex-grow-1 fw-bold shadow-sm d-none" id="btnGuardarCambios">
+                        Guardar cambios
+                    </button>
+                    <button type="button" class="btn btn-light rounded-pill px-4 flex-grow-1 fw-bold" data-bs-dismiss="modal">Cerrar</button>
                 </div>
             </form>
         </div>
     </div>
 </div>
 
-<!-- Modal: Cambiar contraseña -->
+<!-- Modal: Cambiar contraseña (diseño premium como el de perfil) -->
 <div class="modal fade" id="cambiarContrasenaModal" tabindex="-1" aria-labelledby="cambiarContrasenaModalLabel"
     aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content glass-modal">
-            <div class="modal-header border-0">
-                <h5 class="modal-title" id="cambiarContrasenaModalLabel">Cambiar contraseña</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
-            </div>
-            <form id="formCambiarContrasena" action="/cambiar_contrasena" method="post">
-                <div class="modal-body">
-                    <div class="mb-3">
-                        <label for="contrasenaActual" class="form-label">Contraseña actual:</label>
-                        <div class="input-group">
-                            <input type="password" class="form-control glass-input" id="contrasenaActual"
-                                name="contrasena_actual" required>
-                            <button class="btn btn-outline-secondary toggle-password" type="button"
-                                data-target="contrasenaActual">
-                                <i class="bi bi-eye"></i>
-                            </button>
-                        </div>
+        <div class="modal-content border-0 shadow-lg overflow-hidden" style="border-radius: 24px;">
+            <div class="modal-header border-0 p-4 pb-0 position-relative">
+                <div class="position-absolute top-0 start-0 w-100 h-100 opacity-10 bg-success" style="z-index: -1;"></div>
+                <div class="d-flex align-items-center">
+                    <div class="bg-success bg-opacity-10 text-success rounded-circle p-3 me-3">
+                        <i class="bi bi-shield-lock-fill fs-3"></i>
                     </div>
-                    <div class="mb-3">
-                        <label for="nuevaContrasena" class="form-label">Nueva contraseña:</label>
-                        <div class="input-group">
-                            <input type="password" class="form-control glass-input" id="nuevaContrasena"
-                                name="nueva_contrasena" required>
-                            <button class="btn btn-outline-secondary toggle-password" type="button"
-                                data-target="nuevaContrasena">
-                                <i class="bi bi-eye"></i>
-                            </button>
-                        </div>
-                        <div id="nuevaContrasenaFeedback" class="invalid-feedback d-block"></div>
-                    </div>
-                    <div class="mb-3">
-                        <label for="confirmarNuevaContrasena" class="form-label">Confirmar nueva contraseña:</label>
-                        <div class="input-group">
-                            <input type="password" class="form-control glass-input" id="confirmarNuevaContrasena"
-                                name="confirmar_nueva_contrasena" required>
-                            <button class="btn btn-outline-secondary toggle-password" type="button"
-                                data-target="confirmarNuevaContrasena">
-                                <i class="bi bi-eye"></i>
-                            </button>
-                        </div>
-                        <div id="confirmarNuevaContrasenaFeedback" class="invalid-feedback d-block"></div>
+                    <div>
+                        <h5 class="modal-title fw-bold mb-0" id="cambiarContrasenaModalLabel">Seguridad de la cuenta</h5>
+                        <p class="text-muted small mb-0">Cambia tu contraseña para mayor seguridad</p>
                     </div>
                 </div>
-                <div class="modal-footer border-0">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-                    <button type="submit" class="btn btn-primary" id="submitCambiarContrasena">Cambiar
-                        contraseña</button>
+                <button type="button" class="btn-close shadow-none" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+            </div>
+            
+            <form id="formCambiarContrasena" action="/cambiar_contrasena" method="post" class="p-4 pt-1">
+                <div class="modal-body p-0 pt-3">
+                    <div class="row g-3">
+                        <div class="col-12">
+                            <label for="contrasenaActual" class="form-label small fw-bold text-muted text-uppercase mb-1">Contraseña actual</label>
+                            <div class="input-group">
+                                <span class="input-group-text bg-light border-0"><i class="bi bi-lock"></i></span>
+                                <input type="password" class="form-control bg-light border-0 py-2 px-3" id="contrasenaActual"
+                                    name="contrasena_actual" placeholder="Ingresa tu contraseña actual" required style="border-radius: 0 10px 10px 0;">
+                                <button class="btn btn-light border-0 toggle-password" type="button" data-target="contrasenaActual">
+                                    <i class="bi bi-eye"></i>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="col-12">
+                            <label for="nuevaContrasena" class="form-label small fw-bold text-muted text-uppercase mb-1">Nueva contraseña</label>
+                            <div class="input-group">
+                                <span class="input-group-text bg-light border-0"><i class="bi bi-key"></i></span>
+                                <input type="password" class="form-control bg-light border-0 py-2 px-3" id="nuevaContrasena"
+                                    name="nueva_contrasena" placeholder="Mínimo 8 caracteres" required style="border-radius: 0 10px 10px 0;">
+                                <button class="btn btn-light border-0 toggle-password" type="button" data-target="nuevaContrasena">
+                                    <i class="bi bi-eye"></i>
+                                </button>
+                            </div>
+                            <div id="nuevaContrasenaFeedback" class="invalid-feedback d-block small"></div>
+                        </div>
+                        <div class="col-12">
+                            <label for="confirmarNuevaContrasena" class="form-label small fw-bold text-muted text-uppercase mb-1">Confirmar nueva contraseña</label>
+                            <div class="input-group">
+                                <span class="input-group-text bg-light border-0"><i class="bi bi-check2-circle"></i></span>
+                                <input type="password" class="form-control bg-light border-0 py-2 px-3" id="confirmarNuevaContrasena"
+                                    name="confirmar_nueva_contrasena" placeholder="Repite la nueva contraseña" required style="border-radius: 0 10px 10px 0;">
+                                <button class="btn btn-light border-0 toggle-password" type="button" data-target="confirmarNuevaContrasena">
+                                    <i class="bi bi-eye"></i>
+                                </button>
+                            </div>
+                            <div id="confirmarNuevaContrasenaFeedback" class="invalid-feedback d-block small"></div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="modal-footer border-0 p-0 pt-4 d-flex gap-2">
+                    <button type="button" class="btn btn-light rounded-pill px-4 flex-grow-1 fw-bold" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="submit" class="btn btn-success rounded-pill px-4 flex-grow-1 fw-bold shadow-sm" id="submitCambiarContrasena">Actualizar contraseña</button>
                 </div>
             </form>
         </div>
@@ -1059,6 +1076,155 @@
             text-overflow: ellipsis;
         }
     }
+</style>
+<div id="customAlertOverlay" class="custom-alert-overlay">
+    <div id="customAlertBox" class="custom-alert-box error-variant">
+        <button id="closeAlertBtn" class="close-alert-btn" aria-label="Cerrar alerta">
+            <i class="bi bi-x-lg"></i>
+        </button>
+        <div class="alert-icon-container">
+            <div class="alert-icon-ring"></div>
+            <i id="alertIcon" class="bi bi-exclamation-triangle"></i>
+        </div>
+        <div class="alert-content">
+            <h3 id="customAlertTitle" class="alert-title">Aviso del sistema</h3>
+            <p id="customAlertText" class="alert-message">Ha ocurrido un error inesperado.</p>
+        </div>
+        <div class="alert-footer">
+            <button id="custom-alert-ok-btn" class="custom-alert-btn">Entendido</button>
+        </div>
+    </div>
+</div>
+
+<style>
+/* Estilos para alertas glassmorphism premium */
+.custom-alert-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5); /* Oscurecer un poco más para compensar la falta de blur */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 11000 !important; /* Asegurar que esté por encima de TODO */
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
+}
+
+.custom-alert-overlay.show {
+    opacity: 1;
+    visibility: visible;
+}
+
+.custom-alert-box {
+    background: rgba(255, 255, 255, 0.85);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border: 1px solid rgba(255, 255, 255, 0.45);
+    border-radius: 28px;
+    padding: 40px;
+    width: 90%;
+    max-width: 420px;
+    text-align: center;
+    position: relative;
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+    transform: scale(0.8) translateY(20px);
+    transition: all 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.custom-alert-overlay.show .custom-alert-box {
+    transform: scale(1) translateY(0);
+}
+
+.close-alert-btn {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    background: none;
+    border: none;
+    font-size: 18px;
+    color: #888;
+    cursor: pointer;
+    transition: color 0.3s;
+}
+
+.close-alert-btn:hover {
+    color: #333;
+}
+
+.alert-icon-container {
+    position: relative;
+    width: 80px;
+    height: 80px;
+    margin: 0 auto 25px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.alert-icon-ring {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    border: 3px solid currentColor;
+    opacity: 0.15;
+    animation: pulse-ring-alert 2s infinite;
+}
+
+@keyframes pulse-ring-alert {
+    0% { transform: scale(1); opacity: 0.15; }
+    50% { transform: scale(1.1); opacity: 0.1; }
+    100% { transform: scale(1); opacity: 0.15; }
+}
+
+#alertIcon {
+    font-size: 36px;
+}
+
+.error-variant #alertIcon, .error-variant .alert-icon-ring { color: #dc3545; }
+.success-variant #alertIcon, .success-variant .alert-icon-ring { color: #198754; }
+
+.alert-title {
+    font-size: 24px;
+    font-weight: 800;
+    margin-bottom: 12px;
+    color: #1a1a1a;
+    letter-spacing: -0.5px;
+}
+
+.alert-message {
+    font-size: 16px;
+    line-height: 1.6;
+    color: #555;
+    margin-bottom: 30px;
+}
+
+.custom-alert-btn {
+    background: #0d6efd;
+    color: white;
+    border: none;
+    padding: 14px 40px;
+    border-radius: 100px;
+    font-size: 16px;
+    font-weight: 700;
+    cursor: pointer;
+    box-shadow: 0 10px 20px rgba(13, 110, 253, 0.2);
+    transition: all 0.3s;
+    width: 100%;
+}
+
+.custom-alert-btn:hover {
+    background: #0b5ed7;
+    transform: translateY(-2px);
+    box-shadow: 0 12px 25px rgba(13, 110, 253, 0.3);
+}
+
+.success-variant .custom-alert-btn { background: #198754; box-shadow: 0 10px 20px rgba(25, 135, 84, 0.2); }
+.success-variant .custom-alert-btn:hover { background: #157347; box-shadow: 0 12px 25px rgba(25, 135, 84, 0.3); }
 </style>
 {% endblock %}
 

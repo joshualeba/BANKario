@@ -551,9 +551,230 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    // 11. Tooltips Bootstrap
+    // 11. Tooltips de Bootstrap
     const tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
     tooltipTriggerList.map(function (el) {
         return new bootstrap.Tooltip(el);
     });
-});
+    
+    // 13. Lógica para editar el perfil (Nombres y Apellidos)
+    const btnHabilitarEdicion = document.getElementById('btnHabilitarEdicion');
+    const btnGuardarCambios = document.getElementById('btnGuardarCambios');
+    const inputNombres = document.getElementById('editNombres');
+    const inputApellidos = document.getElementById('editApellidos');
+
+    if (btnHabilitarEdicion && inputNombres && inputApellidos) {
+        btnHabilitarEdicion.addEventListener('click', () => {
+            // Habilitar campos
+            inputNombres.removeAttribute('readonly');
+            inputApellidos.removeAttribute('readonly');
+            inputNombres.classList.remove('bg-light');
+            inputApellidos.classList.remove('bg-light');
+            inputNombres.focus();
+
+            // Intercambiar botones
+            btnHabilitarEdicion.classList.add('d-none');
+            if (btnGuardarCambios) btnGuardarCambios.classList.remove('d-none');
+        });
+    }
+
+    // 14. Funcionalidad para mostrar/ocultar contraseñas en modales
+    document.querySelectorAll('.toggle-password').forEach(btn => {
+        btn.addEventListener('click', () => {
+            const targetId = btn.getAttribute('data-target');
+            const input = document.getElementById(targetId);
+            const icon = btn.querySelector('i');
+
+            if (input && icon) {
+                if (input.type === 'password') {
+                    input.type = 'text';
+                    icon.classList.remove('bi-eye');
+                    icon.classList.add('bi-eye-slash');
+                } else {
+                    input.type = 'password';
+                    icon.classList.remove('bi-eye-slash');
+                    icon.classList.add('bi-eye');
+                }
+            }
+        });
+    });
+
+    // Resetear el estado del modal de perfil al cerrarse
+    const modalPerfil = document.getElementById('editarPerfilModal');
+    if (modalPerfil) {
+        modalPerfil.addEventListener('hidden.bs.modal', () => {
+            if (inputNombres) {
+                inputNombres.setAttribute('readonly', true);
+                inputNombres.classList.add('bg-light');
+            }
+            if (inputApellidos) {
+                inputApellidos.setAttribute('readonly', true);
+                inputApellidos.classList.add('bg-light');
+            }
+            if (btnHabilitarEdicion) btnHabilitarEdicion.classList.remove('d-none');
+            if (btnGuardarCambios) btnGuardarCambios.classList.add('d-none');
+        });
+    }
+    // 15. Sistema de alertas glassmorphism premium para el dashboard
+    const customAlertOverlay = document.getElementById('customAlertOverlay');
+    const customAlertBox = document.getElementById('customAlertBox');
+    const customAlertTitle = document.getElementById('customAlertTitle');
+    const customAlertText = document.getElementById('customAlertText');
+    const alertIcon = document.getElementById('alertIcon');
+    const okAlertBtn = document.getElementById('custom-alert-ok-btn');
+    const closeAlertBtn = document.getElementById('closeAlertBtn');
+
+    function showGlassmorphismAlert(message, type = 'error', title = null) {
+        if (customAlertText) customAlertText.textContent = message;
+        
+        if (type === 'success') {
+            if (customAlertBox) customAlertBox.className = 'custom-alert-box success-variant';
+            if (customAlertTitle) customAlertTitle.textContent = title || '¡Cambio exitoso!';
+            if (alertIcon) alertIcon.className = 'bi bi-check-circle';
+        } else {
+            if (customAlertBox) customAlertBox.className = 'custom-alert-box error-variant';
+            if (customAlertTitle) customAlertTitle.textContent = title || 'Aviso de seguridad';
+            if (alertIcon) alertIcon.className = 'bi bi-exclamation-triangle';
+        }
+        
+        if (customAlertOverlay) {
+            customAlertOverlay.classList.add('show');
+        }
+    }
+
+    function hideAlert() {
+        if (customAlertOverlay) {
+            customAlertOverlay.classList.remove('show');
+        }
+    }
+
+    if (okAlertBtn) okAlertBtn.addEventListener('click', hideAlert);
+    if (closeAlertBtn) closeAlertBtn.addEventListener('click', hideAlert);
+    if (customAlertOverlay) {
+        customAlertOverlay.addEventListener('click', (e) => {
+            if (e.target === customAlertOverlay) hideAlert();
+        });
+    }
+
+    // 16. Manejo del formulario de cambio de contraseña con validación profesional
+    const formCambiarContrasena = document.getElementById('formCambiarContrasena');
+    if (formCambiarContrasena) {
+        formCambiarContrasena.addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const passActual = document.getElementById('contrasenaActual').value;
+            const nuevaPass = document.getElementById('nuevaContrasena').value;
+            const confirmarPass = document.getElementById('confirmarNuevaContrasena').value;
+            
+            // Validaciones requeridas por el usuario
+            if (!passActual || !nuevaPass || !confirmarPass) {
+                showGlassmorphismAlert('Todos los campos son obligatorios para el cambio de contraseña.');
+                return;
+            }
+
+            if (nuevaPass !== confirmarPass) {
+                showGlassmorphismAlert('La nueva contraseña y su confirmación no coinciden.');
+                return;
+            }
+
+            // Regla: 8 a 25 caracteres
+            if (nuevaPass.length < 8 || nuevaPass.length > 25) {
+                showGlassmorphismAlert('La nueva contraseña debe tener entre 8 y 25 caracteres.');
+                return;
+            }
+
+            // Regla: Al menos una mayúscula
+            if (!/[A-Z]/.test(nuevaPass)) {
+                showGlassmorphismAlert('La nueva contraseña debe contener al menos una letra mayúscula.');
+                return;
+            }
+
+            // Regla: Al menos un carácter especial
+            // Usamos el mismo set que en app.py para consistencia
+            const especialRegex = /[!@#$%^&*()_+\-=\[\]{};\':"\\|,.<>\/?~]/;
+            if (!especialRegex.test(nuevaPass)) {
+                showGlassmorphismAlert('La nueva contraseña debe incluir al menos un carácter especial (ej. @, #, $, %).');
+                return;
+            }
+
+            // Si pasa validaciones, enviar por fetch
+            const formData = new FormData(this);
+            fetch('/cambiar_contrasena', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    showGlassmorphismAlert(data.message, 'success');
+                    formCambiarContrasena.reset();
+                    // Cerrar el modal de bootstrap después de un momento si es éxito
+                    setTimeout(() => {
+                        const modalEl = document.getElementById('cambiarContrasenaModal');
+                        const modal = bootstrap.Modal.getInstance(modalEl);
+                        if (modal) modal.hide();
+                    }, 2000);
+                } else {
+                    showGlassmorphismAlert(data.message, 'error');
+                }
+            })
+            .catch(err => {
+                console.error('Error:', err);
+                showGlassmorphismAlert('Ocurrió un error inesperado al intentar cambiar la contraseña. Por favor, inténtalo más tarde.');
+            });
+        });
+    }
+    // 17. Manejo del formulario de edición de perfil (Información personal) con AJAX
+    const formEditarPerfil = document.getElementById('formEditarPerfil');
+    if (formEditarPerfil) {
+        formEditarPerfil.addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const formData = new FormData(this);
+            fetch('/actualizar_perfil', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    showGlassmorphismAlert(data.message, 'success');
+                    
+                    // Actualizar el nombre en la interfaz inmediatamente
+                    const displayUserNames = document.querySelectorAll('.display-user-name'); // Selector hipotético, mejor actualizar por ID si existen
+                    const sessionNombres = formData.get('nombres');
+                    const sessionApellidos = formData.get('apellidos');
+                    
+                    // Ajustamos el readonly de nuevo al guardar con éxito
+                    if (inputNombres) {
+                        inputNombres.setAttribute('readonly', true);
+                        inputNombres.classList.add('bg-light');
+                    }
+                    if (inputApellidos) {
+                        inputApellidos.setAttribute('readonly', true);
+                        inputApellidos.classList.add('bg-light');
+                    }
+                    if (btnHabilitarEdicion) btnHabilitarEdicion.classList.remove('d-none');
+                    if (btnGuardarCambios) btnGuardarCambios.classList.add('d-none');
+
+                    // Cerramos el modal después de un aviso
+                    setTimeout(() => {
+                        const modalEl = document.getElementById('editarPerfilModal');
+                        const modal = bootstrap.Modal.getInstance(modalEl);
+                        if (modal) modal.hide();
+                        
+                        // Recargamos o actualizamos los elementos visuales que muestran el nombre si no son dinámicos
+                        // location.reload(); // Opción si hay muchos lugares con el nombre
+                    }, 2000);
+
+                } else {
+                    showGlassmorphismAlert(data.message, 'error');
+                }
+            })
+            .catch(err => {
+                console.error('Error:', err);
+                showGlassmorphismAlert('Ocurrió un error inesperado al actualizar tu información. Por favor, inténtalo más tarde.');
+            });
+        });
+    }
+}); // Cierre de DOMContentLoaded

@@ -14,6 +14,7 @@ import re
 from authlib.integrations.flask_client import OAuth
 import uuid
 from groq import Groq
+import traceback
 
 
 
@@ -460,25 +461,26 @@ def registrar_usuario():
             valid_email = validate_email(correo_electronico, check_deliverability=False) 
             correo_electronico = valid_email.email
         except EmailNotValidError as e:
-            flash(f'El correo electrónico "{correo_electronico}" no es válido: {e}', 'error')
-            return redirect(url_for('mostrar_formulario_registro'))
+            print(f"[DEBUG] Error de validación de correo: {e}")
+            flash(f'El correo electrónico "{correo_electronico}" no es válido. Por favor, revísalo.', 'error')
+            return render_template('registro.html', form_data=request.form)
 
         contrasena_hasheada = generate_password_hash(contrasena_plana)
 
         # --- REFACTORIZADO: lógica de creación con orm ---
         try:
+            print(f"[DEBUG] Intentando crear usuario: {correo_electronico}")
             # 1. crear la entrada de datos personales
             nuevos_datos = DatosP(
                 nombre=nombres,
                 apellidoP=apellidos,
-                apellidoM='', # sp enviaba esto
-                telefono=None, # sp enviaba esto
-                fecha_nacimiento=datetime.now() # sp enviaba esto
+                apellidoM='', 
+                telefono=None, 
+                fecha_nacimiento=datetime.now()
             )
             db.session.add(nuevos_datos)
             
             # 2. crear el usuario y vincularlo
-            # usamos flush para obtener el id de nuevos_datos antes de hacer commit
             db.session.flush() 
             
             nuevo_usuario = Usuarios(
@@ -491,6 +493,7 @@ def registrar_usuario():
             
             # 3. hacer commit de ambas operaciones
             db.session.commit()
+            print(f"[DEBUG] Usuario creado con éxito: {correo_electronico}")
 
             # Registrar actividad de nuevo usuario
             log_activity('create', f"Nuevo registro de usuario: {nombres} {apellidos} ({correo_electronico})")
@@ -498,8 +501,9 @@ def registrar_usuario():
             flash('¡Usuario registrado exitosamente! Ahora puedes iniciar sesión.', 'success')
             return redirect(url_for('mostrar_formulario_inicio_sesion'))
             
-        except IntegrityError: # error específico de sqlalchemy para claves únicas
+        except IntegrityError: 
             db.session.rollback()
+            print("[DEBUG] Error de integridad en la base de datos (posible correo duplicado).")
             # Verificamos si es por correo duplicado para dar un mensaje más útil
             existing_user = Usuarios.query.filter_by(correo_electronico=correo_electronico).first()
             if existing_user:
@@ -508,13 +512,15 @@ def registrar_usuario():
                 else:
                     flash('El correo electrónico ya está registrado. Por favor, intenta iniciar sesión.', 'error')
             else:
-                flash('Error de integridad en la base de datos.', 'error')
+                flash('Error de integridad en la base de datos. Por favor, intenta de nuevo.', 'error')
             
-            return redirect(url_for('mostrar_formulario_registro'))
+            return render_template('registro.html', form_data=request.form)
         except Exception as e:
             db.session.rollback()
-            flash(f"Ocurrió un error inesperado en el servidor: {e}", 'error')
-            return redirect(url_for('mostrar_formulario_registro'))
+            print(f"[ERROR] Error inesperado en el registro:")
+            traceback.print_exc()
+            flash(f"Ocurrió un error inesperado en el servidor. Por favor, contacta a soporte si el problema persiste.", 'error')
+            return render_template('registro.html', form_data=request.form)
         # 'finally' con 'conn.close()' ya no es necesario
 
 @app.route('/iniciar_sesion')
@@ -534,53 +540,52 @@ def login_usuario():
 
         # --- REFACTORIZADO: lógica de login con orm ---
         try:
+            print(f"[DEBUG] Intento de inicio de sesión para: {correo}")
             # consulta usando el orm
             usuario = Usuarios.query.filter_by(correo_electronico=correo).first()
             
             if usuario and usuario.datosp:
                 # VALIDACIÓN: Si es usuario de Google, bloquear login manual
                 if usuario.provider == 'google':
+                    print(f"[DEBUG] Usuario registrado con Google intentando login manual: {correo}")
                     return jsonify(success=False, message='Esta cuenta está registrada con Google. Por favor, utiliza el botón "Continuar con Google".')
 
                 if check_password_hash(usuario.contrasena, contrasena_ingresada):
+                    print(f"[DEBUG] Inicio de sesión exitoso para: {correo}")
                     flash('¡Bienvenido! Has iniciado sesión exitosamente.', 'success')
                     
-                    # actualiza la última sesión (reemplaza sp)
+                    # actualiza la última sesión
                     usuario.ultima_sesion = datetime.now()
                     db.session.commit()
-
+                    
+                    # guardar en sesión el resto de los datos necesarios
                     session['usuario_autenticado'] = True
                     session['user_id'] = usuario.id
                     session['nombres'] = usuario.datosp.nombre
                     session['apellidos'] = usuario.datosp.apellidoP
                     session['correo'] = usuario.correo_electronico
-                    
-                    if usuario.correo_electronico.lower() == "joshualeba2109@gmail.com":
-                        usuario.role = 'superadmin'
-                        db.session.commit()
-                        session['is_admin'] = True
-                        session['user_role'] = 'superadmin'
-                    else:
-                        session['is_admin'] = True if usuario.role in ['admin', 'superadmin'] else False
-                        session['user_role'] = usuario.role
-
+                    session['user_role'] = usuario.role
+                    session['is_admin'] = (usuario.role in ['admin', 'superadmin'])
+                    session['auth_method'] = 'local'
                     session['fecha_registro'] = formato_fecha_es(usuario.fecha_registro)
                     session['ultima_sesion'] = formato_fecha_hora_es(datetime.now())
                     session['test_completado'] = usuario.test_completado
-                    session['auth_method'] = 'local'
 
                     if session.get('is_admin'):
                         log_activity('login', f"El administrador {usuario.datosp.nombre} ha iniciado sesión en el panel.")
                         return jsonify(success=True, redirect=url_for('admin_dashboard'))
                     return jsonify(success=True, redirect=url_for('dashboard'))
                 else:
-                    return jsonify(success=False, message='Contraseña incorrecta. Por favor, inténtalo de nuevo.')
+                    print(f"[DEBUG] Contraseña incorrecta para: {correo}")
+                    return jsonify(success=False, message='La contraseña es incorrecta. Por favor, inténtalo de nuevo.')
             else:
-                return jsonify(success=False, message='Correo electrónico no registrado.')
+                print(f"[DEBUG] Usuario no encontrado: {correo}")
+                return jsonify(success=False, message='El correo electrónico no está registrado.')
             
         except Exception as e:
-            print(f"Error inesperado en login: {e}")
-            return jsonify(success=False, message=f"Ocurrió un error inesperado en el servidor: {e}")
+            print(f"[ERROR] Error inesperado en el inicio de sesión:")
+            traceback.print_exc()
+            return jsonify(success=False, message='Ocurrió un error inesperado en el servidor.')
 
     # 'finally' con 'conn.close()' ya no es necesario
 
@@ -1083,16 +1088,13 @@ def actualizar_perfil():
             session['nombres'] = nombres
             session['apellidos'] = apellidos
 
-            flash('Tu perfil ha sido actualizado exitosamente.', 'success')
+            return jsonify(success=True, message='Tu perfil ha sido actualizado exitosamente.')
         else:
-            flash('Error: No se pudo encontrar el usuario para actualizar.', 'error')
-            
-        return redirect(url_for('dashboard'))
+            return jsonify(success=False, message='Error: No se pudo encontrar el usuario para actualizar.')
     
     except Exception as e:
         db.session.rollback()
-        flash(f"Ocurrió un error inesperado al actualizar tu perfil: {e}", 'error')
-        return redirect(url_for('dashboard'))
+        return jsonify(success=False, message=f"Ocurrió un error inesperado al actualizar tu perfil: {e}")
     # 'finally' con 'conn.close()' ya no es necesario
 
 @app.route('/cambiar_contrasena', methods=['POST'])

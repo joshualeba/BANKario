@@ -99,15 +99,36 @@ document.getElementById("confirm-password").addEventListener("input", checkPassw
 /* ===============================================
    SECCIÓN: MODAL DE ALERTA GENÉRICO
    =============================================== */
-const customAlertOverlay = document.getElementById('custom-alert-overlay');
-const customAlertMessage = document.getElementById('custom-alert-message');
-const customAlertOkBtn = document.getElementById('custom-alert-ok-btn');
-const closeAlertBtn = document.getElementById('close-alert-btn');
+// Elementos del modal glassmorphism premium
+const customAlertOverlay = document.getElementById('customAlertOverlay');
+const customAlertBox = document.getElementById('customAlertBox');
+const customAlertTitle = document.getElementById('customAlertTitle');
+const customAlertText = document.getElementById('customAlertText');
+const alertIcon = document.getElementById('alertIcon');
+const closeAlertBtn = document.getElementById('closeAlertBtn');
+const okAlertBtn = document.getElementById('custom-alert-ok-btn');
+
+function showGlassmorphismAlert(message, type = 'error', title = null) {
+    if (customAlertText) customAlertText.textContent = message;
+    
+    if (type === 'success') {
+        if (customAlertBox) customAlertBox.className = 'custom-alert-box success-variant';
+        if (customAlertTitle) customAlertTitle.textContent = title || '¡Registro exitoso!';
+        if (alertIcon) alertIcon.className = 'fas fa-check-circle';
+    } else {
+        if (customAlertBox) customAlertBox.className = 'custom-alert-box error-variant';
+        if (customAlertTitle) customAlertTitle.textContent = title || 'Aviso del sistema';
+        if (alertIcon) alertIcon.className = 'fas fa-exclamation-triangle';
+    }
+    
+    if (customAlertOverlay) {
+        customAlertOverlay.classList.add('show');
+        document.body.classList.add('blur-active');
+    }
+}
 
 function showAlert(message) {
-    customAlertMessage.textContent = message;
-    customAlertOverlay.classList.add('show');
-    document.body.classList.add('blur-active');
+    showGlassmorphismAlert(message, 'error', 'Error en el formulario');
 }
 
 // Exponer globalmente para que el script en HTML pueda usarlo
@@ -115,17 +136,22 @@ window.showGlassmorphismError = showAlert;
 
 
 function hideAlert() {
-    customAlertOverlay.classList.remove('show');
-    document.body.classList.remove('blur-active');
+    if (customAlertOverlay) {
+        customAlertOverlay.classList.remove('show');
+        document.body.classList.remove('blur-active');
+    }
 }
 
-customAlertOkBtn.addEventListener('click', hideAlert);
-closeAlertBtn.addEventListener('click', hideAlert);
-customAlertOverlay.addEventListener('click', (event) => {
-    if (event.target === customAlertOverlay) {
-        hideAlert();
-    }
-});
+if (okAlertBtn) okAlertBtn.addEventListener('click', hideAlert);
+if (closeAlertBtn) closeAlertBtn.addEventListener('click', hideAlert);
+
+if (customAlertOverlay) {
+    customAlertOverlay.addEventListener('click', (event) => {
+        if (event.target === customAlertOverlay) {
+            hideAlert();
+        }
+    });
+}
 
 /* ===============================================
    SECCIÓN: MODAL DE TÉRMINOS Y CONDICIONES

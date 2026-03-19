@@ -156,11 +156,16 @@
         </div>
     </div>
 
-    <div id="custom-alert-overlay" class="custom-alert-overlay">
-        <div id="custom-alert-box" class="custom-alert-box">
-            <span class="close-alert-btn" id="close-alert-btn">&times;</span>
-            <p id="custom-alert-message"></p>
-            <button id="custom-alert-ok-btn">ok</button>
+    <!-- Modal de alerta glassmorphism mejorado -->
+    <div class="custom-alert-overlay" id="customAlertOverlay">
+        <div class="custom-alert-box" id="customAlertBox">
+            <span class="close-alert-btn" id="closeAlertBtn">&times;</span>
+            <div class="alert-icon-container" id="alertIconContainer">
+                <i class="fas fa-check-circle" id="alertIcon"></i>
+            </div>
+            <h3 id="customAlertTitle">Aviso del sistema</h3>
+            <p id="customAlertText"></p>
+            <button id="custom-alert-ok-btn">Entendido</button>
         </div>
     </div>
 
@@ -301,7 +306,63 @@
                 }
             }
         }
+
+        // Modal Glassmorphism
+        const customAlertOverlay = document.getElementById('customAlertOverlay');
+        const customAlertBox = document.getElementById('customAlertBox');
+        const customAlertTitle = document.getElementById('customAlertTitle');
+        const customAlertText = document.getElementById('customAlertText');
+        const alertIcon = document.getElementById('alertIcon');
+        const closeAlertBtn = document.getElementById('closeAlertBtn');
+        const okAlertBtn = document.getElementById('custom-alert-ok-btn');
+
+        function showGlassmorphismAlert(message, type = 'error', title = null) {
+            if (customAlertText) customAlertText.textContent = message;
+            
+            if (type === 'success') {
+                if (customAlertBox) customAlertBox.className = 'custom-alert-box success-variant';
+                if (customAlertTitle) customAlertTitle.textContent = title || '¡Registro exitoso!';
+                if (alertIcon) alertIcon.className = 'fas fa-check-circle';
+            } else {
+                if (customAlertBox) customAlertBox.className = 'custom-alert-box error-variant';
+                if (customAlertTitle) customAlertTitle.textContent = title || 'Aviso del sistema';
+                if (alertIcon) alertIcon.className = 'fas fa-exclamation-triangle';
+            }
+            
+            if (customAlertOverlay) {
+                customAlertOverlay.classList.add('show');
+                document.body.classList.add('blur-active');
+            }
+        }
+
+        function hideAlert() {
+            if (customAlertOverlay) {
+                customAlertOverlay.classList.remove('show');
+                document.body.classList.remove('blur-active');
+            }
+        }
+
+        if (okAlertBtn) okAlertBtn.addEventListener('click', hideAlert);
+        if (closeAlertBtn) closeAlertBtn.addEventListener('click', hideAlert);
+        
+        if (customAlertOverlay) {
+            customAlertOverlay.addEventListener('click', (event) => {
+                if (event.target === customAlertOverlay) {
+                    hideAlert();
+                }
+            });
+        }
+        
+        // Función showAlert antigua redirigida (usada por registro.js)
+        window.showGlassmorphismError = function(msg) {
+            showGlassmorphismAlert(msg, 'error', 'Aviso del sistema');
+        };
+        
+        function showAlert(msg) {
+            showGlassmorphismAlert(msg, 'error', 'Error en el formulario');
+        }
     </script>
 </body>
 
 </html>
+```
