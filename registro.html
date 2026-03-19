@@ -1,0 +1,307 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Registro - BANKario</title>
+    <link rel="stylesheet" href="css/registro.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="icon" href="https://res.cloudinary.com/dpvm2gro2/image/upload/v1773860043/logo_bzhzun.ico"
+        type="image/x-icon" />
+</head>
+
+<body class="loader_bg">
+    <div class="loader_p">
+        <div class="loader">
+            <span class="loader-text">Cargando</span>
+            <span class="load"></span>
+        </div>
+    </div>
+    <div class="contenedor">
+        <div class="lado-derecho">
+            <video autoplay loop muted class="bg-video">
+                <source src="https://res.cloudinary.com/dpvm2gro2/video/upload/v1773878047/1_jch6qe.mp4"
+                    type="video/mp4">
+                Tu navegador no soporta videos HTML5.
+            </video>
+            <div class="video-overlay"></div>
+            
+            <a href="index.html" class="boton-volver">
+                <i class="fas fa-arrow-left"></i> Volver
+            </a>
+
+            <div class="video-content">
+                <span class="badge-privado">Panel privado</span>
+                <h1 class="main-title">BANKario ecosystem</h1>
+                <p class="main-subtitle">La infraestructura inteligente para la gestión y optimización de tus finanzas personales y empresariales.</p>
+                
+                <div class="stats-row">
+                    <div class="stat-item">
+                        <span class="stat-value">100%</span>
+                        <span class="stat-label">SEGURO</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-value">24/7</span>
+                        <span class="stat-label">DISPONIBLE</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-value">IA</span>
+                        <span class="stat-label">INTEGRADA</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="lado-izquierdo">
+            <div class="formulario">
+                <div class="form-header">
+                    <img src="https://res.cloudinary.com/dpvm2gro2/image/upload/v1773860043/logo_sywuoh.png"
+                    alt="Logo BANKario" class="form-logo">
+                    <h2>Crea tu cuenta</h2>
+                    <p>Únete a la nueva era del control financiero inteligente.</p>
+                </div>
+
+                <a href="/login/google" class="boton-google-moderno">
+                    <img src="https://img.icons8.com/color/16/000000/google-logo.png" alt="Google Logo">
+                    <span>Registrarse con Google</span>
+                    <i class="fas fa-arrow-right"></i>
+                </a>
+
+                <div class="divisor-moderno">
+                    <span>o crea una cuenta</span>
+                </div>
+
+                <form id="registroForm" action="/registrar_usuario" method="post" novalidate>
+                    <div class="input-doble">
+                        <div class="input-group">
+                            <label>Nombre(s)</label>
+                            <div class="input-moderno">
+                                <input type="text" placeholder="Moisés Jorge" name="nombres" required minlength="2" maxlength="30"
+                                    pattern="[A-Za-zÁÉÍÓÚáéíóúÑñ\s]+" title="solo letras y espacios"
+                                    oninput="this.value = this.value.replace(/[^A-Za-zÁÉÍÓÚáéíóúÑñ\s]/g, '')">
+                            </div>
+                        </div>
+                        <div class="input-group">
+                            <label>Apellido(s)</label>
+                            <div class="input-moderno">
+                                <input type="text" placeholder="Maldonado Morales" name="apellidos" required minlength="2"
+                                    maxlength="30" pattern="[A-Za-zÁÉÍÓÚáéíóúÑñ\s]+" title="solo letras y espacios"
+                                    oninput="this.value = this.value.replace(/[^A-Za-zÁÉÍÓÚáéíóúÑñ\s]/g, '')">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="input-group">
+                        <label>Correo electrónico</label>
+                        <div class="input-moderno">
+                            <i class="fas fa-envelope"></i>
+                            <input type="email" placeholder="armandomaldonado@gmail.com" name="correo_electronico" required id="correo"
+                                minlength="6" maxlength="100">
+                        </div>
+                    </div>
+
+                    <div class="input-group">
+                        <label>Contraseña</label>
+                        <div class="input-moderno">
+                            <i class="fas fa-lock"></i>
+                            <input type="password" id="password" name="contrasena" placeholder="••••••••" required
+                                minlength="8" maxlength="25" oninput="checkPasswords()" onfocus="mostrarRequisitos()"
+                                onblur="ocultarRequisitos()">
+                            <span id="eye-icon-password" class="fa fa-eye"
+                                onclick="togglePasswordVisibility('password')"></span>
+                        </div>
+                    </div>
+
+                    <ul id="password-requisitos" class="requisitos-modernos">
+                        <li id="regla-mayuscula">❌ Una mayúscula</li>
+                        <li id="regla-especial">❌ Un carácter especial</li>
+                        <li id="regla-minimo">❌ 8 caracteres</li>
+                        <li id="regla-maximo">✅ Menos de 25 caracteres</li>
+                    </ul>
+
+                    <div class="input-group">
+                        <label>Confirmar contraseña</label>
+                        <div class="input-moderno">
+                            <i class="fas fa-lock"></i>
+                            <input type="password" id="confirm-password" placeholder="••••••••"
+                                oninput="checkPasswords()">
+                            <span id="eye-icon-confirm-password" class="fa fa-eye"
+                                onclick="togglePasswordVisibility('confirm-password')"></span>
+                        </div>
+                    </div>
+                    
+                    <p id="password-message" class="error-text-small"></p>
+
+                    <div class="form-options">
+                        <label class="container-checkbox">
+                            <input type="checkbox" required>
+                            <span class="checkmark"></span>
+                            Acepto los <a href="#" id="termsLink" class="link-tyc">Términos y condiciones</a>
+                        </label>
+                    </div>
+
+                    <button type="submit" class="boton-acceder">
+                        <span>Crear cuenta</span>
+                        <i class="fas fa-arrow-right"></i>
+                    </button>
+                </form>
+                
+                <p class="registro-link">¿Ya tienes una cuenta? <a href="iniciar_sesion.html">Inicia sesión</a></p>
+                
+                <div class="form-footer">
+                    <p>© 2026 BANKario. Todos los derechos reservados.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="custom-alert-overlay" class="custom-alert-overlay">
+        <div id="custom-alert-box" class="custom-alert-box">
+            <span class="close-alert-btn" id="close-alert-btn">&times;</span>
+            <p id="custom-alert-message"></p>
+            <button id="custom-alert-ok-btn">ok</button>
+        </div>
+    </div>
+
+    <div id="termsModalOverlay" class="custom-alert-overlay">
+        <div id="termsModalBox" class="custom-alert-box"> <span class="close-alert-btn"
+                id="closeTermsBtn">&times;</span>
+            <h4 style="margin-bottom: 15px; text-align: center;">Términos y condiciones</h4>
+
+            <div id="termsModalBody">
+                <p style="font-size: 0.8em; opacity: 0.7; text-align: left;">Última actualización: 6 de julio de 2025
+                </p>
+                <h4 class="mb-3">1. Aceptación de los términos</h4>
+                <p>Al acceder y utilizar la plataforma "BANKario" (en adelante, "la plataforma"), usted acepta y se
+                    compromete a cumplir estos términos y condiciones de uso ("términos"). si no está de acuerdo con
+                    estos términos, no debe utilizar la plataforma. nos reservamos el derecho de modificar estos
+                    términos en cualquier momento. la continuación del uso de la plataforma después de dichas
+                    modificaciones constituirá su aceptación de los nuevos términos.</p>
+                <h4 class="mb-3">2. Descripción del servicio</h4>
+                <p>BANKario es una plataforma diseñada para ofrecer simulaciones y herramientas de análisis financiero con
+                    fines educativos y de planificación personal. no proporcionamos asesoramiento financiero
+                    profesional, legal, fiscal o de inversión. la información y las simulaciones generadas en la
+                    plataforma son solo para fines ilustrativos y no deben considerarse como una recomendación para
+                    decisiones financieras reales.</p>
+                <h4 class="mb-3">3. Registro y cuentas de usuario</h4>
+                <ul class="list-unstyled mb-4">
+                    <li class="mb-2" style="position: relative; padding-left: 25px;"><i class="fas fa-check-circle me-2"
+                            style="color: #10B981; position: absolute; left: 0; top: 5px;"></i> Para acceder a ciertas
+                        funcionalidades de la plataforma, deberá registrarse y crear una cuenta. usted es responsable de
+                        mantener la confidencialidad de su contraseña y de todas las actividades que ocurran bajo su
+                        cuenta.</li>
+                    <li class="mb-2" style="position: relative; padding-left: 25px;"><i class="fas fa-check-circle me-2"
+                            style="color: #10B981; position: absolute; left: 0; top: 5px;"></i> Usted se compromete a
+                        proporcionar información precisa, completa y actualizada durante el proceso de registro y a
+                        mantenerla así.</li>
+                    <li class="mb-2" style="position: relative; padding-left: 25px;"><i class="fas fa-check-circle me-2"
+                            style="color: #10B981; position: absolute; left: 0; top: 5px;"></i> Nos reservamos el
+                        derecho de suspender o cancelar su cuenta si la información proporcionada es falsa, inexacta o
+                        incompleta, o si incumple estos términos.</li>
+                </ul>
+                <h4 class="mb-3">4. Uso aceptable de la plataforma</h4>
+                <p>Usted se compromete a utilizar la plataforma solo para fines lícitos y de acuerdo con estos términos.
+                    usted no debe:</p>
+                <ul class="list-unstyled mb-4">
+                    <li class="mb-2" style="position: relative; padding-left: 25px;"><i class="fas fa-times-circle me-2"
+                            style="color: #dc3545; position: absolute; left: 0; top: 5px;"></i> Utilizar la plataforma
+                        de cualquier manera que pueda dañar, deshabilitar, sobrecargar o deteriorar el servidor o la red
+                        de BANKario.</li>
+                    <li class="mb-2" style="position: relative; padding-left: 25px;"><i class="fas fa-times-circle me-2"
+                            style="color: #dc3545; position: absolute; left: 0; top: 5px;"></i> Intentar obtener acceso
+                        no autorizado a cualquier parte de la plataforma, otras cuentas, sistemas informáticos o redes
+                        conectadas a cualquier servidor de BANKario.</li>
+                    <li class="mb-2" style="position: relative; padding-left: 25px;"><i class="fas fa-times-circle me-2"
+                            style="color: #dc3545; position: absolute; left: 0; top: 5px;"></i> Utilizar la plataforma
+                        para cualquier actividad fraudulenta o ilegal.</li>
+                    <li class="mb-2" style="position: relative; padding-left: 25px;"><i class="fas fa-times-circle me-2"
+                            style="color: #dc3545; position: absolute; left: 0; top: 5px;"></i> Cargar o transmitir
+                        cualquier virus, gusano, defecto, troyano o cualquier elemento de naturaleza destructiva.</li>
+                </ul>
+                <h4 class="mb-3">5. Propiedad intelectual</h4>
+                <p>Todos los contenidos de la plataforma, incluyendo, entre otros, textos, gráficos, logotipos, iconos,
+                    imágenes, clips de audio, descargas digitales y software, son propiedad de BANKario o de sus
+                    proveedores de contenido y están protegidos por leyes de derechos de autor y otras leyes de
+                    propiedad intelectual.</p>
+                <h4 class="mb-3">6. Exención de garantías</h4>
+                <p>La plataforma se proporciona "tal cual" y "según disponibilidad", sin garantías de ningún tipo, ya
+                    sean expresas o implícitas. BANKario no garantiza que la plataforma será ininterrumpida, libre de
+                    errores o segura, ni que los resultados obtenidos del uso de la plataforma serán precisos o
+                    confiables.</p>
+                <h4 class="mb-3">7. Limitación de responsabilidad</h4>
+                <p>En ningún caso BANKario, sus directores, empleados o agentes serán responsables de cualquier daño
+                    directo, indirecto, incidental, especial, consecuente o punitivo, incluyendo, entre otros, pérdida
+                    de beneficios, datos o uso, ya sea en una acción contractual, de negligencia o cualquier otra acción
+                    torticera, que surja de o en conexión con el uso o rendimiento de la plataforma.</p>
+                <h4 class="mb-3">8. Indemnización</h4>
+                <p>Usted acepta indemnizar y eximir de responsabilidad a BANKario, sus afiliados, directores, agentes y
+                    empleados de cualquier reclamo o demanda, incluidos los honorarios de abogados, realizados por
+                    cualquier tercero debido a o que surja de su uso de la plataforma, su violación de estos términos o
+                    su violación de cualquier derecho de otro.</p>
+                <h4 class="mb-3">9. Ley aplicable</h4>
+                <p>Estos términos se regirán e interpretarán de acuerdo con las leyes de méxico, sin tener en cuenta sus
+                    principios de conflicto de leyes.</p>
+                <h4 class="mb-3">10. Contacto</h4>
+                <p>Si tiene alguna pregunta sobre estos términos, puede contactarnos a través de
+                    soporte@bankario.com</p>
+            </div>
+
+            <button id="acceptTermsBtn" class="boton-principal" style="margin-top: 20px; width: 50%;">
+                Entendido
+            </button>
+        </div>
+    </div>
+
+    <script src="js/registro.js"></script>
+    <script>
+        // Sección para mostrar errores de Flash (Flask) con el modal Glassmorphism
+        document.addEventListener('DOMContentLoaded', function () {
+            // Obtenemos los mensajes flash enviados desde Flask como JSON
+            const flashMessages = JSON.parse('{{ get_flashed_messages(with_categories=true) | tojson }}');
+
+            if (flashMessages && flashMessages.length > 0) {
+                // Buscamos si hay algún mensaje de error para mostrar el Glassmorphism
+                // Filtramos por categoría 'error' o si el mensaje contiene texto específico
+                const errorMsg = flashMessages.find(msg => msg[0] === 'error' || msg[1].toLowerCase().includes('registrado') || msg[1].toLowerCase().includes('error'));
+
+                if (errorMsg) {
+                    // Llamamos a la función showGlassmorphismError definida en registro.js
+                    // timeout ligero para asegurar que js cargó
+                    setTimeout(() => {
+                        if (typeof showGlassmorphismError === 'function') {
+                            showGlassmorphismError(errorMsg[1]);
+                        } else {
+                            console.error("showGlassmorphismError no encontrada");
+                            alert(errorMsg[1]);
+                        }
+                    }, 300);
+                }
+            }
+        });
+
+        // Función corregida para el toggle de contraseña que sirve para ambos campos
+        // SOBREESCRIBE la de registro.js si existe conflicto o se usa directamente esta si no está en registro.js correctamente
+        function togglePasswordVisibility(id) {
+            const input = document.getElementById(id);
+            // El ID del icono debe coincidir: eye-icon-password o eye-icon-confirm-password
+            const eyeIcon = document.getElementById(`eye-icon-${id}`);
+
+            if (input.type === "password") {
+                input.type = "text";
+                if (eyeIcon) {
+                    eyeIcon.classList.remove('fa-eye');
+                    eyeIcon.classList.add('fa-eye-slash');
+                }
+            } else {
+                input.type = "password";
+                if (eyeIcon) {
+                    eyeIcon.classList.remove('fa-eye-slash');
+                    eyeIcon.classList.add('fa-eye');
+                }
+            }
+        }
+    </script>
+</body>
+
+</html>
