@@ -15,6 +15,7 @@ from authlib.integrations.flask_client import OAuth
 import uuid
 from groq import Groq
 import traceback
+from werkzeug.middleware.proxy_fix import ProxyFix
 
 
 
@@ -56,6 +57,9 @@ def formato_fecha_hora_es(fecha):
 app = Flask(__name__,
             template_folder=os.path.abspath('.'),
             static_folder=os.path.abspath('.'))
+
+# Configuración del proxy para Render (https)
+app.wsgi_app = ProxyFix(app.wsgi_app, x_for=1, x_proto=1, x_host=1, x_prefix=1)
 
 app.secret_key = os.environ.get('FLASK_SECRET_KEY', 'banksecret')
 
